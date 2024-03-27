@@ -5,10 +5,15 @@ import (
 	"sync"
 )
 
+/*
+Дана последовательность чисел: 2,4,6,8,10.
+Найти сумму их квадратов(22+32+42….) с использованием конкурентных вычислений.
+*/
+
 func main() {
 	nums := [5]int{2, 4, 6, 8, 10}
 	var wg sync.WaitGroup
-	sumCh := make(chan int)
+	sumCh := make(chan int, len(nums))
 
 	for _, i := range nums {
 		wg.Add(1)
@@ -18,10 +23,8 @@ func main() {
 		}(i)
 	}
 
-	go func() {
-		wg.Wait()
-		close(sumCh) // Закрытие канала после завершения отправки всех значений
-	}()
+	wg.Wait()
+	close(sumCh)
 
 	var sum int
 	for i := 0; i < len(nums); i++ {
